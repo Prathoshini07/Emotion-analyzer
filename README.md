@@ -117,3 +117,66 @@ Click "Analyze PDF File".
 Select a PDF file(.pdf) with customer feedbacks.
 View aggregated sentiment analysis as charts.
 View Actionable recommendations for businesses.
+
+📌 System Architecture Overview
+The Customer Emotion Analysis System is a MERN-stack application that integrates NLP-based sentiment analysis to evaluate customer feedback. The system accepts input from manual text entry and PDF file uploads, processes it using an AI model, and visualizes the insights through interactive charts.
+
+🛠️ Key Components:
+Frontend (React.js)
+
+User interface for entering text feedback and uploading PDFs.
+Displays sentiment analytics via Chart.js.
+Provides navigation between different modules.
+Backend (Node.js + Express.js)
+
+Handles API requests for text and file analysis.
+Uses Multer for PDF file uploads and pdf-parse for text extraction.
+Processes sentiment data using Xenova/bert-base-multilingual-uncased-sentiment.
+Stores feedback in MongoDB for analysis.
+AI Model (Transformers.js)
+
+NLP pipeline to detect sentiment and categorize emotions.
+Supports multilingual sentiment analysis.
+Database (MongoDB)
+
+Stores user feedback and sentiment scores.
+Enables analytics tracking for trend visualization.
+
+📌 Data Flow Diagrams
+1️⃣ User Text Feedback Analysis Flow
+[User] → (Enters feedback) → [Frontend] → (Sends data via API) → [Backend] → (Processes with AI Model) → [MongoDB] → (Stores result) → [Frontend] → (Displays analysis)
+
+2️⃣ PDF File Upload & Analysis Flow
+[User] → (Uploads PDF) → [Frontend] → (Sends file via API) → [Backend] → (Extracts text via pdf-parse) → (Processes with AI Model) → [MongoDB] → (Stores result) → [Frontend] → (Displays analysis)
+
+📌 Test Cases & Evaluation Scenarios
+The service was amazing!
+JSON Response:
+{
+  "text": "The service was amazing!",
+  "emotions": {
+    "primary": {
+      "emotion": "Joy",
+      "activation": "High",
+      "intensity": 0.79,
+      "confidence": 0.79
+    },
+    "secondary": {
+      "emotion": "Neutral",
+      "activation": "Low",
+      "intensity": 0.3,
+      "confidence": 0.3
+    }
+  },
+  "topics": {
+    "main": []
+  },
+  "adorescore": {
+    "overall": 50
+  },
+  "_id": "67be1d58c0ad672c208dc0d9",
+  "__v": 0
+}
+
+✅ Pass
+
