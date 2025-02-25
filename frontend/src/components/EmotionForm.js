@@ -85,6 +85,11 @@ const EmotionForm = () => {
           <button>Go to Analytics Dashboard</button>
         </Link>
       </div>
+      <div className="file-upload">
+        <Link to="/file-analysis">
+          <button>Analyze PDF File</button>
+        </Link>
+      </div>
     </div>
   );
 };

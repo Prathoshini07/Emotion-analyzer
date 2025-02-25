@@ -3,20 +3,45 @@ import nlp from "compromise";
 export const extractTopics = (text) => {
     const doc = nlp(text);
 
-    // Extract keywords that could be potential topics
-    const mainTopics = doc.nouns().out("array");
+    // 🔹 Extract nouns and adjectives (to detect topics more effectively)
+    const extractedNouns = doc.nouns().out("array").map(word => word.toLowerCase());
+    const adjectives = doc.adjectives().out("array").map(word => word.toLowerCase());
+    const subtopicCandidates = doc.match("#Adjective #Noun").out("array").map(word => word.toLowerCase());
 
-    // Extract phrases that might serve as subtopics
-    const subtopicCandidates = doc.match("#Adjective #Noun").out("array");
-
-    // Organize subtopics under their main topics
-    const subtopics = {};
-    mainTopics.forEach(topic => {
-        subtopics[topic] = subtopicCandidates.filter(phrase => phrase.toLowerCase().includes(topic.toLowerCase()));
-    });
-
-    return {
-        main: mainTopics.length ? mainTopics : ["General"],
-        subtopics: Object.keys(subtopics).length ? subtopics : { General: ["Miscellaneous"] }
+    // 🔹 Predefined product-related topics
+    const predefinedTopics = {
+        "Product": ["product", "item", "brand", "gadget", "device", "model"],
+        "Delivery": ["shipping", "delivered", "delay", "fast", "late", "arrival"],
+        "Quality": ["material", "durability", "sturdy", "defect", "faulty", "poor", "excellent", "nice"],
+        "Pricing": ["cost", "expensive", "cheap", "affordable", "value", "overpriced", "deal"],
+        "Customer Service": ["support", "helpful", "rude", "response", "assistance", "complaint"],
+        "Ease of Use": ["interface", "user-friendly", "complicated", "simple", "intuitive"],
+        "Performance": ["speed", "lag", "efficient", "slow", "responsive"],
+        "Features": ["functionality", "option", "capability", "missing", "customization"],
+        "Aesthetics": ["design", "color", "look", "style", "appearance"]
     };
+
+    let topics = { main: [], subtopics: {} };
+
+    // 🔹 Check if extracted words match predefined topics
+    for (let [topic, keywords] of Object.entries(predefinedTopics)) {
+        if (
+            extractedNouns.some(noun => keywords.includes(noun)) || 
+            adjectives.some(adj => keywords.includes(adj))
+        ) {
+            topics.main.push(topic);
+            topics.subtopics[topic] = subtopicCandidates.filter(phrase => 
+                keywords.some(k => phrase.includes(k))
+            );
+        }
+    }
+
+    // 🔹 Ensure at least one topic is assigned
+    if (topics.main.length === 0) {
+        topics.main.push("General");
+        topics.subtopics["General"] = ["Miscellaneous"];
+    }
+
+    console.log("🟢 Detected Topics:", topics); // 🛠 Debugging
+    return topics;
 };

@@ -1,5 +1,11 @@
+import multer from "multer";
+import pdf from "pdf-parse";
 import Emotion from "../models/emotion.js";
-import { analyzeSentiment } from "../utils/emotionProcessor.js"; // ✅ Ensure correct import
+import { analyzeSentiment } from "../utils/emotionProcessor.js";
+
+// 🟢 Multer Setup (Store PDF in Memory)
+const storage = multer.memoryStorage();
+export const upload = multer({ storage: storage });
 
 export const analyzeText = async (req, res) => {
     try {
@@ -7,12 +13,11 @@ export const analyzeText = async (req, res) => {
         if (!text) return res.status(400).json({ error: "Text is required for analysis." });
 
         // 🟢 Perform real NLP-based emotion analysis (ASYNC)
-        const { emotions, topics, adorescore } = await analyzeSentiment(text); // ✅ FIXED: Await the async function
-
+        const { emotions, topics, adorescore } = await analyzeSentiment(text); 
         // 🟢 Save to database
         const analysisResult = new Emotion({
             text,
-            emotions,  // ✅ Now directly using "emotions" instead of destructuring
+            emotions, 
             topics,
             adorescore
         });
@@ -83,5 +88,58 @@ export const getAnalyticsData = async (req, res) => {
   } catch (error) {
     console.error("Error fetching analytics:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const analyzeFile = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+
+    console.log("File received:", req.file.originalname);
+
+    // ✅ Extract text from the uploaded PDF buffer
+    const pdfData = await pdf(req.file.buffer);
+    const extractedText = pdfData.text.trim();
+
+    if (!extractedText) {
+      return res.status(400).json({ error: "No readable text found in PDF." });
+    }
+
+    // ✅ Process extracted text
+    const feedbackList = extractedText.split("\n").filter(line => line.trim() !== "");
+    
+    let sentimentResults = [];
+    let emotionCounts = {};
+    let totalSentiment = 0;
+
+    for (let feedback of feedbackList) {
+      const { emotions, topics, adorescore } = await analyzeSentiment(feedback);
+      totalSentiment += adorescore.overall;
+      sentimentResults.push({ text: feedback, emotions, topics, adorescore });
+
+      let primaryEmotion = emotions.primary.emotion;
+      emotionCounts[primaryEmotion] = (emotionCounts[primaryEmotion] || 0) + 1;
+    }
+
+    const totalFeedback = sentimentResults.length;
+    const averageSentiment = totalFeedback > 0 ? totalSentiment / totalFeedback : 50;
+    const mostCommonEmotion = Object.keys(emotionCounts).reduce((a, b) =>
+      emotionCounts[a] > emotionCounts[b] ? a : b, "Neutral");
+
+    res.status(200).json({
+      totalFeedback,
+      averageSentiment: parseFloat(averageSentiment.toFixed(2)),
+      mostCommonEmotion,
+      emotionDistribution: emotionCounts,
+      sentimentTrend: {
+        labels: feedbackList.map((_, i) => `Feedback ${i + 1}`),
+        data: sentimentResults.map(entry => entry.adorescore.overall),
+      },
+    });
+
+  } catch (error) {
+    console.error("Error analyzing file:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
