@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Bar, Pie, Line } from "react-chartjs-2";
+import { Pie, Line } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import "./FileAnalysis.css";
 
