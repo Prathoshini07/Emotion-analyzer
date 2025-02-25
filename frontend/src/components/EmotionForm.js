@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom"; // Import Link for navigation
 import "./EmotionForm.css"; // Import the CSS file for styling
 
 const EmotionForm = () => {
@@ -11,7 +12,7 @@ const EmotionForm = () => {
   const emojiList = ["😊", "😢", "😡", "😮", "😍", "🤔", "😎", "🥳", "😴", "🤩"];
 
   // Function to generate random emojis
-  const generateEmojis = () => {
+  const generateEmojis = useCallback(() => {
     const newEmojis = Array.from({ length: 4 }, () => ({
       emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
       id: Math.random(),
@@ -19,12 +20,12 @@ const EmotionForm = () => {
       duration: Math.random() * 10 + 10, // Random duration for slow movement
     }));
     setEmojis(newEmojis);
-  };
+  }, []);
 
   // Generate emojis on component mount
   useEffect(() => {
     generateEmojis();
-  }, []);
+  }, [generateEmojis]);
 
   const analyzeText = async () => {
     if (!text) return;
@@ -72,12 +73,17 @@ const EmotionForm = () => {
           {result && (
             <div className="result-box">
               <h4>JSON Response:</h4>
-              <pre>
-                {JSON.stringify(result, null, 2)}
-              </pre>
+              <pre>{JSON.stringify(result, null, 2)}</pre>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Link to Analytics Dashboard */}
+      <div className="dashboard-link">
+        <Link to="/analytics">
+          <button>Go to Analytics Dashboard</button>
+        </Link>
       </div>
     </div>
   );

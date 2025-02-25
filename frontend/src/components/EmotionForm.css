@@ -2,10 +2,10 @@
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background: url('../assets/img2.jpg') no-repeat center center fixed; /* Local image path */
+    background: url('../assets/img1.png') no-repeat center center fixed; /* Local image path */
     background-size: cover;
     display: flex;
-    justify-content: flex-start; /* Align content to the left */
+    justify-content: center; /* Align content to the left */
     align-items: center;
     min-height: 100vh;
     overflow: hidden;
@@ -130,3 +130,23 @@ body {
       opacity: 0; /* Fully transparent at the top */
     }
   }
+  /* Dashboard Link */
+.dashboard-link {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.dashboard-link button {
+  padding: 10px 20px;
+  background-color: #28a745; /* Green color for the button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-link button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
