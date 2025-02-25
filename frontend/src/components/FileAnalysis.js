@@ -115,6 +115,33 @@ const FileAnalysis = () => {
       },
     ],
   };
+  const generateRecommendations = () => {
+    const { mostCommonEmotion, totalFeedback, averageSentiment } = analyticsData;
+    let recommendations = [];
+
+    if (mostCommonEmotion === "Anger" || mostCommonEmotion === "Disappointment") {
+      recommendations.push("🔴 Improve customer support response time and resolution quality.");
+    }
+    if (averageSentiment < 50) {
+      recommendations.push("⚠️ Address key negative trends by improving product/service offerings.");
+    }
+    if (totalFeedback > 20 && averageSentiment > 70) {
+      recommendations.push("✅ Maintain strong customer engagement and reward loyal customers.");
+    }
+    if (emotionDistributionData["Joy"] > totalFeedback * 0.5) {
+      recommendations.push("🎉 Capitalize on positive feedback by promoting customer testimonials.");
+    }
+    if (emotionDistributionData["Disappointment"] > 5) {
+      recommendations.push("🛠 Re-evaluate pricing and quality to meet customer expectations.");
+    }
+    if (emotionDistributionData["Neutral"] > totalFeedback * 0.3) {
+      recommendations.push("🔄 Gather more detailed feedback to understand customer needs better.");
+    }
+
+    return recommendations.length ? recommendations : ["✅ No major concerns detected. Maintain current strategy."];
+  };
+
+  const recommendations = generateRecommendations();
 
   return (
     <div className="file-analysis-page">
@@ -135,6 +162,14 @@ const FileAnalysis = () => {
             <h3>Most Common Emotion</h3>
             <p>{analyticsData.mostCommonEmotion || "N/A"}</p>
           </div>
+        </div>
+        <div className="recommendations-container fade-in">
+          <h2>📌 Actionable Business Recommendations</h2>
+          <ul>
+            {recommendations.map((rec, index) => (
+              <li key={index}>{rec}</li>
+            ))}
+          </ul>
         </div>
 
         {/* Charts Section */}

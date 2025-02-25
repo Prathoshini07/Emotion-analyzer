@@ -116,3 +116,4 @@ See charts and trends of customer feedback.
 Click "Analyze PDF File".
 Select a PDF file(.pdf) with customer feedbacks.
 View aggregated sentiment analysis as charts.
+View Actionable recommendations for businesses.
